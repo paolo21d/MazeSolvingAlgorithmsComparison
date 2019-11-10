@@ -27,4 +27,8 @@ public class Node {
         if (!neighbours.contains(n))
             neighbours.add(n);
     }
+
+    public boolean isNeighbour(Node n){
+        return neighbours.contains(n);
+    }
 }
