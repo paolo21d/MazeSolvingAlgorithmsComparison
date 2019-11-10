@@ -35,26 +35,15 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         sizeX = x;
         sizeY = y;
 
-        mazeStructure = new ArrayList<>();
-        for (int i = 0; i < sizeY; i++) {
-            for (int j = 0; j < sizeX; j++) {
-                mazeStructure.add(new Node(j, i));
-            }
-        }
+        List<Boolean> visited = prepareVisitedList();
+        Stack<Node> previousNodes = new Stack<>();
+
+        prepareNodes();
 
         Integer startX = random.nextInt(x);
         Integer startY = random.nextInt(y);
 
         Node startNode = getNode(startX, startY);
-        MazeGenerationDFS(startNode);
-
-    }
-
-    private  void MazeGenerationDFS(Node startNode){
-        Random random = new Random();
-        List<Boolean> visited = prepareVisitedList();
-        Stack<Node> previousNodes = new Stack<>();
-
         previousNodes.push(startNode);
 
         while(!previousNodes.empty()){
@@ -75,7 +64,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
                 potentialNodes.add(getNode(currentNode.getX(), currentNode.getY() - 1));
             }
 
-            if(potentialNodes.size() > 0) {
+            if(!potentialNodes.isEmpty()) {
                 Node randomNode = potentialNodes.get(random.nextInt(potentialNodes.size()));
 
                 currentNode.addNeighbour(randomNode);
@@ -87,31 +76,30 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
                 previousNodes.pop();
             }
         }
-
     }
 
     public String getSimplifiedMazeStructure() {
-        return null;
-    }
+        StringBuilder stringBuilder = new StringBuilder();
 
-    public  void printMaze(){
         for (int i = 0; i < sizeY; i++) {
             // draw the north edge
             for (int j = 0; j < sizeX; j++) {
-                System.out.print((!checkIfNodeFitsToMazeSize(j, i-1) || !getNode(j, i).isNeighbour(getNode(j, i-1))) ? "+---" : "+   ");
+                stringBuilder.append((!checkIfNodeFitsToMazeSize(j, i-1) || !getNode(j, i).isNeighbour(getNode(j, i-1))) ? "+---" : "+   ");
             }
-            System.out.println("+");
+            stringBuilder.append("+\n");
             // draw the west edge
             for (int j = 0; j < sizeX; j++) {
-                System.out.print((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "|   " : "    ");
+               stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "|   " : "    ");
             }
-            System.out.println("|");
+            stringBuilder.append("|\n");
         }
         // draw the bottom line
         for (int j = 0; j < sizeX; j++) {
-            System.out.print("+---");
+            stringBuilder.append("+---");
         }
-        System.out.println("+");
+        stringBuilder.append("+\n");
+
+        return  stringBuilder.toString();
     }
 
     public List<Node> BFS() {
@@ -173,6 +161,16 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         return endOfMaze == node;
     }
 
+    private void prepareNodes(){
+
+        mazeStructure = new ArrayList<>();
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                mazeStructure.add(new Node(x, y));
+            }
+        }
+    }
+
     private void readFromFile(String path) throws IOException {
         BufferedReader reader;
         reader = new BufferedReader(new FileReader(path));
@@ -186,13 +184,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
             throw new ReadFileException();
         }
 
-        //prepare nodes
-        mazeStructure = new ArrayList<>();
-        for (int y = 0; y < sizeY; y++) {
-            for (int x = 0; x < sizeX; x++) {
-                mazeStructure.add(new Node(x, y));
-            }
-        }
+        prepareNodes();
+
         //read maze structure - nodes and theirs neighbours
         line = reader.readLine();
         while (line != null) {
