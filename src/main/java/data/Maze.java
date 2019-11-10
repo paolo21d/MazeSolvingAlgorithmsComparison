@@ -36,8 +36,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         sizeY = y;
 
         mazeStructure = new ArrayList<>();
-        for (int i = 0; i < sizeX; i++) {
-            for (int j = 0; j < sizeY; j++) {
+        for (int i = 0; i < sizeY; i++) {
+            for (int j = 0; j < sizeX; j++) {
                 mazeStructure.add(new Node(j, i));
             }
         }
