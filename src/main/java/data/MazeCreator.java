@@ -4,14 +4,12 @@ public interface MazeCreator {
 
     /**
      * This method reads maze structure from file
-     * File structure
-     * ###O##
-     * ##OO##
-     * #OO###
-     * #O####
+     * File structure:
+     * mazeSizeX mazeSizeY
+     * mazeBeginx mazeBeginY
+     * mazeEndX mazeEndY
+     * curves between nodes, each in new line eg: 0 0 1 1
      *
-     * # - wall (impassible)
-     * O - empty space (passable)
      */
     void readMazeStructureFromFile();
 

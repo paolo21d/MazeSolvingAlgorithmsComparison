@@ -102,16 +102,32 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         sizeX = Integer.valueOf(parts.get(0));
         sizeY = Integer.valueOf(parts.get(1));
         if (sizeX <= 0 || sizeY <= 0) {
-            throw new ReadFileException();
+            throw new ReadFileException("Incorrect maze size");
         }
 
         //prepare nodes
         mazeStructure = new ArrayList<>();
-        for (int x = 0; x < sizeX; x++) {
-            for (int y = 0; y < sizeY; y++) {
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
                 mazeStructure.add(new Node(x, y));
             }
         }
+
+        //read begin and end of maze
+        line = reader.readLine();
+        parts = Arrays.asList(line.split(" "));
+        Integer beginX = Integer.valueOf(parts.get(0));
+        Integer beginY = Integer.valueOf(parts.get(1));
+        line = reader.readLine();
+        parts = Arrays.asList(line.split(" "));
+        Integer endX = Integer.valueOf(parts.get(0));
+        Integer endY = Integer.valueOf(parts.get(1));
+        if (!checkIfNodeFitsToMazeSize(beginX, beginY) || !checkIfNodeFitsToMazeSize(endX, endY)) {
+            throw new ReadFileException("Incorrect maze begin or end");
+        }
+        beginOfMaze = getNode(beginX, beginY);
+        endOfMaze = getNode(endX, endY);
+
         //read maze structure - nodes and theirs neighbours
         line = reader.readLine();
         while (line != null) {
@@ -123,7 +139,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
             Integer toNodeY = Integer.valueOf(parts.get(3));
 
             if (!checkIfNodeFitsToMazeSize(fromNodeX, fromNodeY) || !checkIfNodeFitsToMazeSize(toNodeX, toNodeY)) {
-                throw new ReadFileException();
+                throw new ReadFileException("Incorrect node's neighbour");
             }
 
             Node fromNode = getNode(fromNodeX, fromNodeY);
@@ -145,5 +161,9 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
      */
     private boolean checkIfNodeFitsToMazeSize(Integer nodeX, Integer nodeY) {
         return nodeX >= 0 && nodeX < sizeX && nodeY >= 0 && nodeY < sizeY;
+    }
+
+    private List<Node> DFSSetDepth(Integer depth) {
+        return null;
     }
 }
