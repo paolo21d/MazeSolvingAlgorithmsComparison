@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 @Getter
@@ -28,11 +29,88 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     }
 
     public void generateMazeStructure(Integer x, Integer y) {
+        Random random = new Random();
+
+        sizeX = x;
+        sizeY = y;
+
+        mazeStructure = new ArrayList<>();
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+                mazeStructure.add(new Node(j, i));
+            }
+        }
+
+        Integer startX = random.nextInt(x);
+        Integer startY = random.nextInt(y);
+
+        Node startNode = getNode(startX, startY);
+        MazeGenerationDFS(startNode);
+
+    }
+
+    private  void MazeGenerationDFS(Node startNode){
+        Random random = new Random();
+        List<Boolean> visited = prepareVisitedList();
+        Stack<Node> previousNodes = new Stack<>();
+
+        previousNodes.push(startNode);
+
+        while(!previousNodes.empty()){
+            Node currentNode = previousNodes.peek();
+            setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
+            ArrayList<Node> potentialNodes = new ArrayList<>();
+
+            if(checkIfNodeFitsToMazeSize(currentNode.getX() + 1, currentNode.getY()) && !isVisitedFromCoordinates(visited, currentNode.getX() + 1, currentNode.getY())){
+                potentialNodes.add(getNode(currentNode.getX() + 1, currentNode.getY()));
+            }
+            if(checkIfNodeFitsToMazeSize(currentNode.getX() - 1, currentNode.getY()) && !isVisitedFromCoordinates(visited, currentNode.getX() - 1, currentNode.getY())){
+                potentialNodes.add(getNode(currentNode.getX() - 1, currentNode.getY()));
+            }
+            if(checkIfNodeFitsToMazeSize(currentNode.getX(), currentNode.getY() + 1) && !isVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY() + 1)){
+                potentialNodes.add(getNode(currentNode.getX(), currentNode.getY() + 1));
+            }
+            if(checkIfNodeFitsToMazeSize(currentNode.getX(), currentNode.getY() - 1) && !isVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY() - 1)){
+                potentialNodes.add(getNode(currentNode.getX(), currentNode.getY() - 1));
+            }
+
+            if(potentialNodes.size() > 0) {
+                Node randomNode = potentialNodes.get(random.nextInt(potentialNodes.size()));
+
+                currentNode.addNeighbour(randomNode);
+                randomNode.addNeighbour(currentNode);
+
+                previousNodes.push(getNode(randomNode.getX(), randomNode.getY()));
+            }
+            else{
+                previousNodes.pop();
+            }
+        }
 
     }
 
     public String getSimplifiedMazeStructure() {
         return null;
+    }
+
+    public  void printMaze(){
+        for (int i = 0; i < sizeY; i++) {
+            // draw the north edge
+            for (int j = 0; j < sizeX; j++) {
+                System.out.print((!checkIfNodeFitsToMazeSize(j, i-1) || !getNode(j, i).isNeighbour(getNode(j, i-1))) ? "+---" : "+   ");
+            }
+            System.out.println("+");
+            // draw the west edge
+            for (int j = 0; j < sizeX; j++) {
+                System.out.print((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "|   " : "    ");
+            }
+            System.out.println("|");
+        }
+        // draw the bottom line
+        for (int j = 0; j < sizeX; j++) {
+            System.out.print("+---");
+        }
+        System.out.println("+");
     }
 
     public List<Node> BFS() {
@@ -74,7 +152,11 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
 
     private List<Boolean> prepareVisitedList() {
         List<Boolean> visited = Arrays.asList(new Boolean[getSizeX() * getSizeY()]);
-        visited.forEach(v -> v = false);
+        //visited.forEach(v -> v = false);  nie działa
+        for(int i = 0; i < visited.size(); i++){
+            visited.set(i, false);
+        }
+
         return visited;
     }
 

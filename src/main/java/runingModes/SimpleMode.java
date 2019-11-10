@@ -5,6 +5,7 @@ import data.Maze;
 public class SimpleMode {
     public static void main(String[] args){
         Maze maze = new Maze();
-        maze.readMazeStructureFromFile();
+        maze.generateMazeStructure(50, 50);
+        maze.printMaze();
     }
 }
