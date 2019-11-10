@@ -1,13 +1,14 @@
 package data;
 
 
+import exceptions.ReadFileException;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 @Getter
 @Setter
@@ -18,7 +19,13 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     private Integer sizeX, sizeY;
 
     public void readMazeStructureFromFile() {
-
+        try {
+            //Scanner in = new Scanner(System.in);
+            String path = "C:\\Users\\paolo\\Desktop\\PSZT\\mazeStructure1.txt";
+            readFromFile(path);
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
     }
 
     public void generateMazeStructure(Integer x, Integer y) {
@@ -83,5 +90,60 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
 
     private Boolean checkMazeEnd(Node node) {
         return endOfMaze == node;
+    }
+
+    private void readFromFile(String path) throws IOException {
+        BufferedReader reader;
+        reader = new BufferedReader(new FileReader(path));
+
+        //read & analyze size of maze
+        String line = reader.readLine();
+        List<String> parts = Arrays.asList(line.split(" "));
+        sizeX = Integer.valueOf(parts.get(0));
+        sizeY = Integer.valueOf(parts.get(1));
+        if (sizeX <= 0 || sizeY <= 0) {
+            throw new ReadFileException();
+        }
+
+        //prepare nodes
+        mazeStructure = new ArrayList<>();
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                mazeStructure.add(new Node(x, y));
+            }
+        }
+        //read maze structure - nodes and theirs neighbours
+        line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            parts = Arrays.asList(line.split(" "));
+            Integer fromNodeX = Integer.valueOf(parts.get(0));
+            Integer fromNodeY = Integer.valueOf(parts.get(1));
+            Integer toNodeX = Integer.valueOf(parts.get(2));
+            Integer toNodeY = Integer.valueOf(parts.get(3));
+
+            if (!checkIfNodeFitsToMazeSize(fromNodeX, fromNodeY) || !checkIfNodeFitsToMazeSize(toNodeX, toNodeY)) {
+                throw new ReadFileException();
+            }
+
+            Node fromNode = getNode(fromNodeX, fromNodeY);
+            Node toNode = getNode(toNodeX, toNodeY);
+            fromNode.addNeighbour(toNode);
+            toNode.addNeighbour(fromNode);
+
+            // read next line
+            line = reader.readLine();
+        }
+        reader.close();
+    }
+
+    /**
+     * Check if node with coordinates (x,y) fits to maze size
+     *
+     * @param nodeX
+     * @param nodeY
+     */
+    private boolean checkIfNodeFitsToMazeSize(Integer nodeX, Integer nodeY) {
+        return nodeX >= 0 && nodeX < sizeX && nodeY >= 0 && nodeY < sizeY;
     }
 }

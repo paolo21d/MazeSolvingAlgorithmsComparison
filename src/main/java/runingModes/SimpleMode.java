@@ -1,7 +1,10 @@
 package runingModes;
 
-public class SimpleMode {
-    public static void Main(String[] args){
+import data.Maze;
 
+public class SimpleMode {
+    public static void main(String[] args){
+        Maze maze = new Maze();
+        maze.readMazeStructureFromFile();
     }
 }
