@@ -5,12 +5,14 @@ import exceptions.ReadFileException;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,56 +32,29 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         }
     }
 
-    private void generateRandomStartAndEnd(){
-        generateRandomStart();
-        generateRandomEnd();
-    }
+    private void generateRandomStartAndEnd() {
+        beginOfMaze = generateRandomPoint();
+        endOfMaze = generateRandomPoint();
 
-    private void generateRandomStart(){
-        Random random = new Random();
-
-        switch (random.nextInt(4)){
-            case 0:
-                setBeginOfMaze(getNode(random.nextInt(sizeX), 0));
-                break;
-            case 1:
-                setBeginOfMaze(getNode(random.nextInt(sizeX), sizeY-1));
-                break;
-            case 2:
-                setBeginOfMaze(getNode(0, random.nextInt(sizeY)));
-                break;
-            case 3:
-                setBeginOfMaze(getNode(sizeX-1, random.nextInt(sizeY)));
-                break;
-            default:
-                setBeginOfMaze(getNode(0,0));
-                break;
+        while (beginOfMaze.equals(endOfMaze)) {
+            endOfMaze = generateRandomPoint();
         }
     }
 
-    private void generateRandomEnd(){
+    private Node generateRandomPoint() {
         Random random = new Random();
 
-        switch (random.nextInt(4)){
+        switch (random.nextInt(4)) {
             case 0:
-                setEndOfMaze(getNode(random.nextInt(sizeX), 0));
-                break;
+                return getNode(random.nextInt(sizeX), 0);
             case 1:
-                setEndOfMaze(getNode(random.nextInt(sizeX), sizeY-1));
-                break;
+                return getNode(random.nextInt(sizeX), sizeY - 1);
             case 2:
-                setEndOfMaze(getNode(0, random.nextInt(sizeY)));
-                break;
+                return getNode(0, random.nextInt(sizeY));
             case 3:
-                setEndOfMaze(getNode(sizeX-1, random.nextInt(sizeY)));
-                break;
+                return getNode(sizeX - 1, random.nextInt(sizeY));
             default:
-                setEndOfMaze(getNode(sizeX-1,sizeY-1));
-                break;
-        }
-
-        if (endOfMaze.equals(beginOfMaze)){
-            generateRandomEnd();
+                return getNode(0, 0);
         }
     }
 
@@ -104,33 +79,32 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         Node startNode = getNode(startX, startY);
         nodeStack.push(startNode);
 
-        while(!nodeStack.empty()){
+        while (!nodeStack.empty()) {
             Node currentNode = nodeStack.peek();
             setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
             ArrayList<Node> potentialNodes = new ArrayList<>();
 
-            if(checkIfNodeFitsToMazeSize(currentNode.getX() + 1, currentNode.getY()) && !isVisitedFromCoordinates(visited, currentNode.getX() + 1, currentNode.getY())){
+            if (checkIfNodeFitsToMazeSize(currentNode.getX() + 1, currentNode.getY()) && !isVisitedFromCoordinates(visited, currentNode.getX() + 1, currentNode.getY())) {
                 potentialNodes.add(getNode(currentNode.getX() + 1, currentNode.getY()));
             }
-            if(checkIfNodeFitsToMazeSize(currentNode.getX() - 1, currentNode.getY()) && !isVisitedFromCoordinates(visited, currentNode.getX() - 1, currentNode.getY())){
+            if (checkIfNodeFitsToMazeSize(currentNode.getX() - 1, currentNode.getY()) && !isVisitedFromCoordinates(visited, currentNode.getX() - 1, currentNode.getY())) {
                 potentialNodes.add(getNode(currentNode.getX() - 1, currentNode.getY()));
             }
-            if(checkIfNodeFitsToMazeSize(currentNode.getX(), currentNode.getY() + 1) && !isVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY() + 1)){
+            if (checkIfNodeFitsToMazeSize(currentNode.getX(), currentNode.getY() + 1) && !isVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY() + 1)) {
                 potentialNodes.add(getNode(currentNode.getX(), currentNode.getY() + 1));
             }
-            if(checkIfNodeFitsToMazeSize(currentNode.getX(), currentNode.getY() - 1) && !isVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY() - 1)){
+            if (checkIfNodeFitsToMazeSize(currentNode.getX(), currentNode.getY() - 1) && !isVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY() - 1)) {
                 potentialNodes.add(getNode(currentNode.getX(), currentNode.getY() - 1));
             }
 
-            if(!potentialNodes.isEmpty()) {
+            if (!potentialNodes.isEmpty()) {
                 Node randomNode = potentialNodes.get(random.nextInt(potentialNodes.size()));
 
                 currentNode.addNeighbour(randomNode);
                 randomNode.addNeighbour(currentNode);
 
                 nodeStack.push(getNode(randomNode.getX(), randomNode.getY()));
-            }
-            else{
+            } else {
                 nodeStack.pop();
             }
         }
@@ -142,12 +116,12 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         for (int i = 0; i < sizeY; i++) {
             // draw the north edge
             for (int j = 0; j < sizeX; j++) {
-                stringBuilder.append((!checkIfNodeFitsToMazeSize(j, i-1) || !getNode(j, i).isNeighbour(getNode(j, i-1))) ? "+---" : "+   ");
+                stringBuilder.append((!checkIfNodeFitsToMazeSize(j, i - 1) || !getNode(j, i).isNeighbour(getNode(j, i - 1))) ? "+---" : "+   ");
             }
             stringBuilder.append("+\n");
             // draw the west edge
             for (int j = 0; j < sizeX; j++) {
-               stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "|   " : "    ");
+                stringBuilder.append((!checkIfNodeFitsToMazeSize(j - 1, i) || !getNode(j, i).isNeighbour(getNode(j - 1, i))) ? "|   " : "    ");
             }
             stringBuilder.append("|\n");
         }
@@ -157,34 +131,30 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         }
         stringBuilder.append("+\n");
 
-        return  stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
-    public String getSimplifiedMazeSolution(){
+    public String getSimplifiedMazeSolution() {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < sizeY; i++) {
             // draw the north edge
             for (int j = 0; j < sizeX; j++) {
-                stringBuilder.append((!checkIfNodeFitsToMazeSize(j, i-1) || !getNode(j, i).isNeighbour(getNode(j, i-1))) ? "+----" : "+    ");
+                stringBuilder.append((!checkIfNodeFitsToMazeSize(j, i - 1) || !getNode(j, i).isNeighbour(getNode(j, i - 1))) ? "+----" : "+    ");
             }
             stringBuilder.append("+\n");
             // draw the west edge
             for (int j = 0; j < sizeX; j++) {
-                if(pathSolution.contains(getNode(j, i))){
-                    if(getNode(j, i).equals(beginOfMaze)){
-                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "| B  " : "  B  ");
+                if (pathSolution.contains(getNode(j, i))) {
+                    if (getNode(j, i).equals(beginOfMaze)) {
+                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j - 1, i) || !getNode(j, i).isNeighbour(getNode(j - 1, i))) ? "| B  " : "  B  ");
+                    } else if (getNode(j, i).equals(endOfMaze)) {
+                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j - 1, i) || !getNode(j, i).isNeighbour(getNode(j - 1, i))) ? "| E  " : "  E  ");
+                    } else {
+                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j - 1, i) || !getNode(j, i).isNeighbour(getNode(j - 1, i))) ? "| x  " : "  x  ");
                     }
-                    else if(getNode(j, i).equals(endOfMaze)){
-                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "| E  " : "  E  ");
-                    }
-                    else{
-                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "| x  " : "  x  ");
-                    }
-                }
-                else
-                {
-                    stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "|    " : "     ");
+                } else {
+                    stringBuilder.append((!checkIfNodeFitsToMazeSize(j - 1, i) || !getNode(j, i).isNeighbour(getNode(j - 1, i))) ? "|    " : "     ");
                 }
             }
             stringBuilder.append("|\n");
@@ -195,13 +165,22 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         }
         stringBuilder.append("+\n");
 
-        return  stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
     public List<Node> BFS() {
         List<Boolean> visited = prepareVisitedList();
+        List<Node> path = new ArrayList<>();
         Queue<Node> nodeQueue = new LinkedList<>();
         nodeQueue.add(beginOfMaze);
+
+        List<Node> backtrackList = new ArrayList<>();
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                backtrackList.add(new Node(x, y));
+            }
+        }
+
         while (!nodeQueue.isEmpty()) {
             Node node = nodeQueue.poll();
             setVisitedFromCoordinates(visited, node.getX(), node.getY(), true);
@@ -210,12 +189,25 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
             for (Node neighbour : node.getNeighbours()) {
                 if (isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY()))
                     continue;
+
+                backtrackList.set(neighbour.getY() * sizeX + neighbour.getX(), node);
                 nodeQueue.add(neighbour);
             }
         }
 
-        //TODO Implement backtracking (for every node I have to know from which node I came)
-        return null;
+        Node backtrack = endOfMaze;
+        while (!backtrack.equals(beginOfMaze)) {
+            path.add(backtrack);
+            backtrack = getNodeFromList(backtrackList, backtrack.getX(), backtrack.getY());
+        }
+        path.add(beginOfMaze);
+
+        pathSolution = path;
+        return pathSolution;
+    }
+
+    private Node getNodeFromList(List<Node> list, Integer x, Integer y) {
+        return list.get(y * sizeX + x);
     }
 
     public List<Node> DFS() {
@@ -224,10 +216,10 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     }
 
     public List<Node> IDFS() {
-        for (int depth = 1; depth < sizeX * sizeY; depth++){
+        for (int depth = 1; depth < sizeX * sizeY; depth++) {
             pathSolution = DFSSetDepth(depth);
 
-            if(!pathSolution.isEmpty()){
+            if (!pathSolution.isEmpty()) {
                 break;
             }
         }
@@ -247,7 +239,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     private List<Boolean> prepareVisitedList() {
         List<Boolean> visited = Arrays.asList(new Boolean[getSizeX() * getSizeY()]);
         //visited.forEach(v -> v = false);  nie działa
-        for(int i = 0; i < visited.size(); i++){
+        for (int i = 0; i < visited.size(); i++) {
             visited.set(i, false);
         }
 
@@ -266,8 +258,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         return endOfMaze == node;
     }
 
-    private void prepareNodes(){
-
+    private void prepareNodes() {
         mazeStructure = new ArrayList<>();
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
@@ -333,6 +324,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
 
     /**
      * Check if node with coordinates (x,y) fits to maze size
+     *
      * @param nodeX
      * @param nodeY
      */
@@ -348,35 +340,35 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         nodeStack.push(beginOfMaze);
         Integer currentDepth = 0;
 
-        while (!nodeStack.empty()){
+        while (!nodeStack.empty()) {
             Node currentNode = nodeStack.peek();
             setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
-            if(checkMazeEnd(currentNode)){
+            if (checkMazeEnd(currentNode)) {
                 break;
             }
 
-            if(currentDepth.equals(depth)){
+            if (currentDepth.equals(depth)) {
                 nodeStack.pop();
                 currentDepth--;
                 continue;
             }
 
-            for(Node neighbour : currentNode.getNeighbours()){
-                if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())){
+            for (Node neighbour : currentNode.getNeighbours()) {
+                if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())) {
                     nodeStack.push(neighbour);
                     currentDepth++;
                     break;
                 }
             }
 
-            if(nodeStack.peek() == currentNode){
+            if (nodeStack.peek() == currentNode) {
                 nodeStack.pop();
                 currentDepth--;
             }
 
         }
 
-        while (!nodeStack.empty()){
+        while (!nodeStack.empty()) {
             path.add(nodeStack.pop());
         }
 
