@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.security.InvalidParameterException;
 import java.util.*;
 
 @Getter
@@ -17,6 +18,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     private List<Node> mazeStructure;
     private Node beginOfMaze, endOfMaze;
     private Integer sizeX, sizeY;
+    private List<Node> pathSolution;
 
     public void readMazeStructureFromFile() {
         try {
@@ -28,25 +30,82 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         }
     }
 
+    private void generateRandomStartAndEnd(){
+        generateRandomStart();
+        generateRandomEnd();
+    }
+
+    private void generateRandomStart(){
+        Random random = new Random();
+
+        switch (random.nextInt(4)){
+            case 0:
+                setBeginOfMaze(getNode(random.nextInt(sizeX), 0));
+                break;
+            case 1:
+                setBeginOfMaze(getNode(random.nextInt(sizeX), sizeY-1));
+                break;
+            case 2:
+                setBeginOfMaze(getNode(0, random.nextInt(sizeY)));
+                break;
+            case 3:
+                setBeginOfMaze(getNode(sizeX-1, random.nextInt(sizeY)));
+                break;
+            default:
+                setBeginOfMaze(getNode(0,0));
+                break;
+        }
+    }
+
+    private void generateRandomEnd(){
+        Random random = new Random();
+
+        switch (random.nextInt(4)){
+            case 0:
+                setEndOfMaze(getNode(random.nextInt(sizeX), 0));
+                break;
+            case 1:
+                setEndOfMaze(getNode(random.nextInt(sizeX), sizeY-1));
+                break;
+            case 2:
+                setEndOfMaze(getNode(0, random.nextInt(sizeY)));
+                break;
+            case 3:
+                setEndOfMaze(getNode(sizeX-1, random.nextInt(sizeY)));
+                break;
+            default:
+                setEndOfMaze(getNode(sizeX-1,sizeY-1));
+                break;
+        }
+
+        if (endOfMaze.equals(beginOfMaze)){
+            generateRandomEnd();
+        }
+    }
+
     public void generateMazeStructure(Integer x, Integer y) {
+        if (x == 1 && y == 1)
+            throw new InvalidParameterException();
+
         Random random = new Random();
 
         sizeX = x;
         sizeY = y;
 
         List<Boolean> visited = prepareVisitedList();
-        Stack<Node> previousNodes = new Stack<>();
+        Stack<Node> nodeStack = new Stack<>();
 
         prepareNodes();
+        generateRandomStartAndEnd();
 
         Integer startX = random.nextInt(x);
         Integer startY = random.nextInt(y);
 
         Node startNode = getNode(startX, startY);
-        previousNodes.push(startNode);
+        nodeStack.push(startNode);
 
-        while(!previousNodes.empty()){
-            Node currentNode = previousNodes.peek();
+        while(!nodeStack.empty()){
+            Node currentNode = nodeStack.peek();
             setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
             ArrayList<Node> potentialNodes = new ArrayList<>();
 
@@ -69,10 +128,10 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
                 currentNode.addNeighbour(randomNode);
                 randomNode.addNeighbour(currentNode);
 
-                previousNodes.push(getNode(randomNode.getX(), randomNode.getY()));
+                nodeStack.push(getNode(randomNode.getX(), randomNode.getY()));
             }
             else{
-                previousNodes.pop();
+                nodeStack.pop();
             }
         }
     }
@@ -101,6 +160,44 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         return  stringBuilder.toString();
     }
 
+    public String getSimplifiedMazeSolution(){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < sizeY; i++) {
+            // draw the north edge
+            for (int j = 0; j < sizeX; j++) {
+                stringBuilder.append((!checkIfNodeFitsToMazeSize(j, i-1) || !getNode(j, i).isNeighbour(getNode(j, i-1))) ? "+----" : "+    ");
+            }
+            stringBuilder.append("+\n");
+            // draw the west edge
+            for (int j = 0; j < sizeX; j++) {
+                if(pathSolution.contains(getNode(j, i))){
+                    if(getNode(j, i).equals(beginOfMaze)){
+                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "| B  " : "  B  ");
+                    }
+                    else if(getNode(j, i).equals(endOfMaze)){
+                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "| E  " : "  E  ");
+                    }
+                    else{
+                        stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "| x  " : "  x  ");
+                    }
+                }
+                else
+                {
+                    stringBuilder.append((!checkIfNodeFitsToMazeSize(j-1, i) || !getNode(j, i).isNeighbour(getNode(j-1, i)))? "|    " : "     ");
+                }
+            }
+            stringBuilder.append("|\n");
+        }
+        // draw the bottom line
+        for (int j = 0; j < sizeX; j++) {
+            stringBuilder.append("+----");
+        }
+        stringBuilder.append("+\n");
+
+        return  stringBuilder.toString();
+    }
+
     public List<Node> BFS() {
         List<Boolean> visited = prepareVisitedList();
         Queue<Node> nodeQueue = new LinkedList<>();
@@ -122,11 +219,20 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     }
 
     public List<Node> DFS() {
-        return null;
+        pathSolution = DFSSetDepth(sizeX * sizeY);
+        return pathSolution;
     }
 
     public List<Node> IDFS() {
-        return null;
+        for (int depth = 1; depth < sizeX * sizeY; depth++){
+            pathSolution = DFSSetDepth(depth);
+
+            if(!pathSolution.isEmpty()){
+                break;
+            }
+        }
+
+        return pathSolution;
     }
 
     /**
@@ -237,18 +343,43 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     private List<Node> DFSSetDepth(Integer depth) {
         List<Boolean> visited = prepareVisitedList();
         Stack<Node> nodeStack = new Stack<Node>();
+        List<Node> path = new ArrayList<>();
+
         nodeStack.push(beginOfMaze);
-        Integer currentDepth = 1;
+        Integer currentDepth = 0;
+
         while (!nodeStack.empty()){
-            Node node = nodeStack.pop();
-            setVisitedFromCoordinates(visited, node.getX(), node.getY(), true);
-            if(checkMazeEnd(node)){
+            Node currentNode = nodeStack.peek();
+            setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
+            if(checkMazeEnd(currentNode)){
                 break;
             }
 
+            if(currentDepth.equals(depth)){
+                nodeStack.pop();
+                currentDepth--;
+                continue;
+            }
+
+            for(Node neighbour : currentNode.getNeighbours()){
+                if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())){
+                    nodeStack.push(neighbour);
+                    currentDepth++;
+                    break;
+                }
+            }
+
+            if(nodeStack.peek() == currentNode){
+                nodeStack.pop();
+                currentDepth--;
+            }
 
         }
 
-        return null;
+        while (!nodeStack.empty()){
+            path.add(nodeStack.pop());
+        }
+
+        return path;
     }
 }
