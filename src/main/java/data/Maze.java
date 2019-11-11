@@ -14,8 +14,7 @@ import java.util.*;
 @Setter
 public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     private List<Node> mazeStructure;
-    private Node beginOfMaze;
-    private Node endOfMaze;
+    private Node beginOfMaze, endOfMaze;
     private Integer sizeX, sizeY;
 
     public void readMazeStructureFromFile() {
@@ -84,8 +83,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     }
 
     private void setVisitedFromCoordinates(List<Boolean> visited, Integer x, Integer y, Boolean value) {
-        Boolean v = visited.get(y * sizeX + x);
-        v = value;
+        visited.set(y * sizeX + x, value);
     }
 
     private Boolean checkMazeEnd(Node node) {
@@ -155,7 +153,6 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
 
     /**
      * Check if node with coordinates (x,y) fits to maze size
-     *
      * @param nodeX
      * @param nodeY
      */
@@ -164,6 +161,20 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     }
 
     private List<Node> DFSSetDepth(Integer depth) {
+        List<Boolean> visited = prepareVisitedList();
+        Stack<Node> nodeStack = new Stack<Node>();
+        nodeStack.push(beginOfMaze);
+        Integer currentDepth = 1;
+        while (!nodeStack.empty()){
+            Node node = nodeStack.pop();
+            setVisitedFromCoordinates(visited, node.getX(), node.getY(), true);
+            if(checkMazeEnd(node)){
+                break;
+            }
+
+
+        }
+
         return null;
     }
 }
