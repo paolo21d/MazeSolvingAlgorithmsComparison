@@ -5,14 +5,11 @@ import exceptions.ReadFileException;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.security.InvalidParameterException;
 import java.util.*;
-import java.util.List;
 
 @Getter
 @Setter
@@ -228,6 +225,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
     }
 
     /**
+     * Return from nodes list node with coordinates (x,y)
      * @param x - X coordinate of Node
      * @param y - Y coordinate of Node
      * @return Node which have got coordinates (x,y)
