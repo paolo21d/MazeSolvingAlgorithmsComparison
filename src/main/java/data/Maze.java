@@ -13,7 +13,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class Maze implements MazeCreator, MazeSolver, MazePrinter {
+public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     private List<Node> mazeStructure;
     private Node beginOfMaze, endOfMaze;
     private Integer sizeX, sizeY;
@@ -222,6 +222,10 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter {
         }
 
         return pathSolution;
+    }
+
+    public Maze clone() throws CloneNotSupportedException {
+        return (Maze) super.clone();
     }
 
     /**

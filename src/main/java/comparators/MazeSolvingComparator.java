@@ -1,4 +1,6 @@
-package data;
+package comparators;
+
+import data.Maze;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +16,8 @@ public class MazeSolvingComparator {
     public static void simpleComparator(Maze maze) {
         //BFS
         System.out.println("BFS:\t"+getDurationOfBFS(maze)+"ms");
-
         //DFS
         System.out.println("BFS:\t"+getDurationOfDFS(maze)+"ms");
-
         //IDFS
         System.out.println("BFS:\t"+getDurationOfIDFS(maze)+"ms");
     }
@@ -44,21 +44,61 @@ public class MazeSolvingComparator {
         System.out.println("IDFS:\t"+averageDurationOfIDFS+"ms");
     }
 
-    private static Long getDurationOfBFS(Maze maze) {
+    public static void averageMultiThreadComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) {
+        List<Maze> mazesBFS = new ArrayList<>();
+        List<Maze> mazesDFS = new ArrayList<>();
+        List<Maze> mazesIDFS = new ArrayList<>();
+        try {
+            for(int i=0; i<quantityOfTries; i++) {
+                Maze maze = new Maze();
+                maze.generateMazeStructure(sizeX, sizeY);
+                mazesBFS.add(maze.clone());
+                mazesDFS.add(maze.clone());
+                mazesIDFS.add(maze.clone());
+            }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        BFSRunner bfsRunner = new BFSRunner(mazesBFS);
+        DFSRunner dfsRunner = new DFSRunner(mazesDFS);
+        IDFSRunner idfsRunner = new IDFSRunner(mazesIDFS);
+
+        Thread bfsThread = new Thread(bfsRunner);
+        Thread dfsThread = new Thread(dfsRunner);
+        Thread idfsThread = new Thread(idfsRunner);
+
+        bfsThread.start();
+        dfsThread.start();
+        idfsThread.start();
+
+        try {
+            bfsThread.join();
+            dfsThread.join();
+            idfsThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("BFS:\t"+bfsRunner.getAverageDuration()+"ms");
+        System.out.println("DFS:\t"+dfsRunner.getAverageDuration()+"ms");
+        System.out.println("IDFS:\t"+idfsRunner.getAverageDuration()+"ms");
+    }
+
+    public static Long getDurationOfBFS(Maze maze) {
         long start = System.currentTimeMillis();
         maze.BFS();
         long end = System.currentTimeMillis();
         return end-start;
     }
 
-    private static Long getDurationOfDFS(Maze maze) {
+    public static Long getDurationOfDFS(Maze maze) {
         long start = System.currentTimeMillis();
         maze.DFS();
         long end = System.currentTimeMillis();
         return end-start;
     }
 
-    private static Long getDurationOfIDFS(Maze maze) {
+    public static Long getDurationOfIDFS(Maze maze) {
         long start = System.currentTimeMillis();
         maze.IDFS();
         long end = System.currentTimeMillis();

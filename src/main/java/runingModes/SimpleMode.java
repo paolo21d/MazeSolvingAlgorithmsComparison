@@ -1,7 +1,7 @@
 package runingModes;
 
+import comparators.MazeSolvingComparator;
 import data.Maze;
-import data.MazeSolvingComparator;
 
 public class SimpleMode {
     public static void main(String[] args) {
@@ -15,8 +15,11 @@ public class SimpleMode {
         System.out.println(maze.getSimplifiedMazeSolution());*/
 
         //MazeSolvingComparator.simpleComparator(1000, 1000);
-        prepareJavaMachine();
-        MazeSolvingComparator.averageComparator(10, 10, 20);
+        //prepareJavaMachine();
+        //MazeSolvingComparator.averageComparator(10, 10, 20);
+
+
+        MazeSolvingComparator.averageMultiThreadComparator(300, 300, 50);
     }
 
     private static void prepareJavaMachine() {
