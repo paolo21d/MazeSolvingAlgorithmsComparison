@@ -22,7 +22,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     public void readMazeStructureFromFile() {
         try {
             //Scanner in = new Scanner(System.in);
-            String path = "C:\\Users\\paolo\\Desktop\\PSZT\\mazeStructure1.txt";
+            //TODO Add getting path to file from user
+            String path = "C:\\Users\\alexe\\Desktop\\structure.txt";
             readFromFile(path);
         } catch (IOException e) {
             System.out.println(e.toString());
@@ -132,6 +133,10 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     }
 
     public String getSimplifiedMazeSolution() {
+        if (pathSolution == null) {
+            return getSimplifiedMazeStructure();
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < sizeY; i++) {
@@ -230,6 +235,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     /**
      * Return from nodes list node with coordinates (x,y)
+     *
      * @param x - X coordinate of Node
      * @param y - Y coordinate of Node
      * @return Node which have got coordinates (x,y)
@@ -240,7 +246,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     private List<Boolean> prepareVisitedList() {
         List<Boolean> visited = Arrays.asList(new Boolean[getSizeX() * getSizeY()]);
-        //visited.forEach(v -> v = false);  nie działa
+
         for (int i = 0; i < visited.size(); i++) {
             visited.set(i, false);
         }
@@ -302,7 +308,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         //read maze structure - nodes and theirs neighbours
         line = reader.readLine();
         while (line != null) {
-            System.out.println(line);
+            //System.out.println(line);
             parts = Arrays.asList(line.split(" "));
             Integer fromNodeX = Integer.valueOf(parts.get(0));
             Integer fromNodeY = Integer.valueOf(parts.get(1));
