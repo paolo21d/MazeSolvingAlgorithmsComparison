@@ -2,6 +2,7 @@ package comparators;
 
 import data.Maze;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class MazeSolvingComparator {
         System.out.println("BFS:\t"+getDurationOfIDFS(maze)+"ms");
     }
 
-    public static void averageComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) {
+    public static void averageComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) throws InvalidParameterException {
         Maze maze = new Maze();
         List<Long> durationsOfBFS = new ArrayList<>();
         List<Long> durationsOfDFS = new ArrayList<>();

@@ -1,5 +1,7 @@
 package data;
 
+import java.io.IOException;
+
 public interface MazeCreator {
 
     /**
@@ -11,7 +13,7 @@ public interface MazeCreator {
      * curves between nodes, each in new line eg: 0 0 1 1
      *
      */
-    void readMazeStructureFromFile();
+    void readMazeStructureFromFile(String path) throws IOException;
 
     /**
      * This method generates random maze structure

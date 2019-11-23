@@ -19,43 +19,14 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     private Integer sizeX, sizeY;
     private List<Node> pathSolution;
 
-    public void readMazeStructureFromFile() {
-        try {
-            //Scanner in = new Scanner(System.in);
-            String path = "C:\\Users\\paolo\\Desktop\\PSZT\\mazeStructure1.txt";
-            readFromFile(path);
-        } catch (IOException e) {
-            System.out.println(e.toString());
-        }
+    //Maze Creator
+    @Override
+    public void readMazeStructureFromFile(String path) throws IOException {
+        readFromFile(path);
     }
 
-    private void generateRandomStartAndEnd() {
-        beginOfMaze = generateRandomPoint();
-        endOfMaze = generateRandomPoint();
-
-        while (beginOfMaze.equals(endOfMaze)) {
-            endOfMaze = generateRandomPoint();
-        }
-    }
-
-    private Node generateRandomPoint() {
-        Random random = new Random();
-
-        switch (random.nextInt(4)) {
-            case 0:
-                return getNode(random.nextInt(sizeX), 0);
-            case 1:
-                return getNode(random.nextInt(sizeX), sizeY - 1);
-            case 2:
-                return getNode(0, random.nextInt(sizeY));
-            case 3:
-                return getNode(sizeX - 1, random.nextInt(sizeY));
-            default:
-                return getNode(0, 0);
-        }
-    }
-
-    public void generateMazeStructure(Integer x, Integer y) {
+    @Override
+    public void generateMazeStructure(Integer x, Integer y) throws InvalidParameterException {
         if (x == 1 && y == 1)
             throw new InvalidParameterException();
 
@@ -107,6 +78,13 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         }
     }
 
+    //Maze Printer
+    @Override
+    public boolean saveMazeStructureToFile(String path) throws IOException{
+        return false;
+    }
+
+    @Override
     public String getSimplifiedMazeStructure() {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -131,6 +109,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         return stringBuilder.toString();
     }
 
+    @Override
     public String getSimplifiedMazeSolution() {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -165,6 +144,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         return stringBuilder.toString();
     }
 
+    //MazeSolver
+    @Override
     public List<Node> BFS() {
         List<Boolean> visited = prepareVisitedList();
         List<Node> path = new ArrayList<>();
@@ -203,15 +184,13 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         return pathSolution;
     }
 
-    private Node getNodeFromList(List<Node> list, Integer x, Integer y) {
-        return list.get(y * sizeX + x);
-    }
-
+    @Override
     public List<Node> DFS() {
         pathSolution = DFSSetDepth(sizeX * sizeY);
         return pathSolution;
     }
 
+    @Override
     public List<Node> IDFS() {
         for (int depth = 1; depth < sizeX * sizeY; depth++) {
             pathSolution = DFSSetDepth(depth);
@@ -224,12 +203,44 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         return pathSolution;
     }
 
+    @Override
     public Maze clone() throws CloneNotSupportedException {
         return (Maze) super.clone();
+    }
+    //Private Methods
+    private void generateRandomStartAndEnd() {
+        beginOfMaze = generateRandomPoint();
+        endOfMaze = generateRandomPoint();
+
+        while (beginOfMaze.equals(endOfMaze)) {
+            endOfMaze = generateRandomPoint();
+        }
+    }
+
+    private Node generateRandomPoint() {
+        Random random = new Random();
+
+        switch (random.nextInt(4)) {
+            case 0:
+                return getNode(random.nextInt(sizeX), 0);
+            case 1:
+                return getNode(random.nextInt(sizeX), sizeY - 1);
+            case 2:
+                return getNode(0, random.nextInt(sizeY));
+            case 3:
+                return getNode(sizeX - 1, random.nextInt(sizeY));
+            default:
+                return getNode(0, 0);
+        }
+    }
+
+    private Node getNodeFromList(List<Node> list, Integer x, Integer y) {
+        return list.get(y * sizeX + x);
     }
 
     /**
      * Return from nodes list node with coordinates (x,y)
+     *
      * @param x - X coordinate of Node
      * @param y - Y coordinate of Node
      * @return Node which have got coordinates (x,y)

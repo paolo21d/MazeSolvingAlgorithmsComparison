@@ -1,5 +1,7 @@
 package data;
 
+import java.io.IOException;
+
 public interface MazePrinter {
 
     /**
@@ -17,4 +19,9 @@ public interface MazePrinter {
      * @return String contains x - maze columns, y - maze rows and structure which represents structure of maze
      */
     String getSimplifiedMazeSolution();
+
+    /**
+     * This method save maze structure to file in special format, which can be read by app later
+     * */
+    boolean saveMazeStructureToFile(String path) throws IOException;
 }
