@@ -111,6 +111,10 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     @Override
     public String getSimplifiedMazeSolution() {
+        if (pathSolution == null) {
+            return getSimplifiedMazeStructure();
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < sizeY; i++) {
@@ -251,7 +255,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     private List<Boolean> prepareVisitedList() {
         List<Boolean> visited = Arrays.asList(new Boolean[getSizeX() * getSizeY()]);
-        //visited.forEach(v -> v = false);  nie działa
+
         for (int i = 0; i < visited.size(); i++) {
             visited.set(i, false);
         }
@@ -313,7 +317,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         //read maze structure - nodes and theirs neighbours
         line = reader.readLine();
         while (line != null) {
-            System.out.println(line);
+            //System.out.println(line);
             parts = Arrays.asList(line.split(" "));
             Integer fromNodeX = Integer.valueOf(parts.get(0));
             Integer fromNodeY = Integer.valueOf(parts.get(1));
