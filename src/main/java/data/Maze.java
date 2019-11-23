@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.*;
 
@@ -27,7 +29,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     @Override
     public void generateMazeStructure(Integer x, Integer y) throws InvalidParameterException {
-        if (x <=1 || y <= 1)
+        if (x <= 1 || y <= 1)
             throw new InvalidParameterException();
         Random random = new Random();
 
@@ -79,8 +81,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     //Maze Printer
     @Override
-    public boolean saveMazeStructureToFile(String path) throws IOException{
-        return false;
+    public void saveMazeStructureToFile(String fileName) throws IOException {
+        saveToFile(fileName);
     }
 
     @Override
@@ -210,6 +212,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     public Maze clone() throws CloneNotSupportedException {
         return (Maze) super.clone();
     }
+
     //Private Methods
     private void generateRandomStartAndEnd() {
         beginOfMaze = generateRandomPoint();
@@ -281,6 +284,30 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
                 mazeStructure.add(new Node(x, y));
             }
         }
+    }
+
+    private void saveToFile(String fileName) throws IOException {
+        PrintWriter writer = new PrintWriter(fileName + ".txt", StandardCharsets.UTF_8);
+        List<Boolean> visited = prepareVisitedList();
+
+        writer.println(sizeX + " " + sizeY);
+        writer.println(beginOfMaze.getX() + " " + beginOfMaze.getY());
+        writer.println(endOfMaze.getX() + " " + endOfMaze.getY());
+
+        for (int i = 0; i < sizeY; i++) {
+            for (int j = 0; j < sizeX; j++) {
+                Node currentNode = getNode(i, j);
+                setVisitedFromCoordinates(visited, i, j, true);
+
+                for (Node neighbour : currentNode.getNeighbours()) {
+                    if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())) {
+                        writer.println(currentNode.getX() + " " + currentNode.getY() + " " +
+                                neighbour.getX() + " " + neighbour.getY());
+                    }
+                }
+            }
+        }
+        writer.close();
     }
 
     private void readFromFile(String path) throws IOException {

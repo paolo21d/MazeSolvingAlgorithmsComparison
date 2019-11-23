@@ -135,9 +135,9 @@ public class SimpleMode {
                         break;
                     case "4":  //save structure to file
                         System.out.println("Enter name of file:");
-                        String path = in.nextLine();
+                        String fileName = in.nextLine();
                         try {
-                            maze.saveMazeStructureToFile(path);
+                            maze.saveMazeStructureToFile(fileName);
                         } catch (IOException e) {
                             System.out.println(e.toString());
                         }
