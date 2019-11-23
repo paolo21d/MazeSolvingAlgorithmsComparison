@@ -27,9 +27,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     @Override
     public void generateMazeStructure(Integer x, Integer y) throws InvalidParameterException {
-        if (x == 1 && y == 1)
+        if (x <=1 || y <= 1)
             throw new InvalidParameterException();
-
         Random random = new Random();
 
         sizeX = x;
@@ -112,7 +111,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     @Override
     public String getSimplifiedMazeSolution() {
         if (pathSolution == null) {
-            return getSimplifiedMazeStructure();
+            BFS();
         }
 
         StringBuilder stringBuilder = new StringBuilder();

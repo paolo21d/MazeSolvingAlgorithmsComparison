@@ -99,13 +99,14 @@ public class SimpleMode {
                         generatedMenu = true;
                         mainMenu = false;
                         break;
-                    case "3":
+                    case "3": //Print stats
                         System.out.println("Maze size X:");
                         sizeX = Integer.parseInt(in.nextLine());
                         System.out.println("Maze size Y:");
                         sizeY = Integer.parseInt(in.nextLine());
                         System.out.println("Quantity of tries:");
                         quantityOfTries = Integer.parseInt(in.nextLine());
+                        System.out.println("Calculating...");
                         try {
                             prepareJavaMachine();
                             MazeSolvingComparator.averageComparator(sizeX, sizeY, quantityOfTries);

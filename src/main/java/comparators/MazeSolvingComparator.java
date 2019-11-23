@@ -18,9 +18,9 @@ public class MazeSolvingComparator {
         //BFS
         System.out.println("BFS:\t"+getDurationOfBFS(maze)+"ms");
         //DFS
-        System.out.println("BFS:\t"+getDurationOfDFS(maze)+"ms");
+        System.out.println("DFS:\t"+getDurationOfDFS(maze)+"ms");
         //IDFS
-        System.out.println("BFS:\t"+getDurationOfIDFS(maze)+"ms");
+        System.out.println("IDFS:\t"+getDurationOfIDFS(maze)+"ms");
     }
 
     public static void averageComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) throws InvalidParameterException {
