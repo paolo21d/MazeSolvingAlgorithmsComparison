@@ -152,15 +152,20 @@ public class SimpleMode {
             else if (loadedMenu && maze != null) { //maze structure loaded from file
                 System.out.println(loadedMenuMessage);
                 option = in.nextLine();
-                if (option.equals("1")) { //print structure
-                    System.out.println(maze.getSimplifiedMazeStructure());
-                } else if (option.equals("2")) { //show solution
-                    System.out.println(maze.getSimplifiedMazeSolution());
-                } else if (option.equals("3")) { //print stats
-                    MazeSolvingComparator.simpleComparator(maze);
-                } else if (option.equals("0")) { //back to main menu
-                    loadedMenu = false;
-                    mainMenu = true;
+                switch (option) {
+                    case "1":  //print structure
+                        System.out.println(maze.getSimplifiedMazeStructure());
+                        break;
+                    case "2":  //show solution
+                        System.out.println(maze.getSimplifiedMazeSolution());
+                        break;
+                    case "3":  //print stats
+                        MazeSolvingComparator.simpleComparator(maze);
+                        break;
+                    case "0":  //back to main menu
+                        loadedMenu = false;
+                        mainMenu = true;
+                        break;
                 }
             }
         }
