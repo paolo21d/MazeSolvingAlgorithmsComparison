@@ -20,6 +20,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     private Node beginOfMaze, endOfMaze;
     private Integer sizeX, sizeY;
     private List<Node> pathSolution;
+    private Long lastRunSteps;
 
     //Maze Creator
     @Override
@@ -155,6 +156,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         List<Boolean> visited = prepareVisitedList();
         List<Node> path = new ArrayList<>();
         Queue<Node> nodeQueue = new LinkedList<>();
+        Long steps = 0L;
         nodeQueue.add(beginOfMaze);
 
         List<Node> backtrackList = new ArrayList<>();
@@ -165,6 +167,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         }
 
         while (!nodeQueue.isEmpty()) {
+            steps++;
             Node node = nodeQueue.poll();
             setVisitedFromCoordinates(visited, node.getX(), node.getY(), true);
             if (checkMazeEnd(node))
@@ -185,18 +188,21 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         }
         path.add(beginOfMaze);
 
+        lastRunSteps = steps;
         pathSolution = path;
         return pathSolution;
     }
 
     @Override
     public List<Node> DFS() {
+        lastRunSteps = 0L;
         pathSolution = DFSSetDepth(sizeX * sizeY);
         return pathSolution;
     }
 
     @Override
     public List<Node> IDFS() {
+        lastRunSteps = 0L;
         for (int depth = 1; depth < sizeX * sizeY; depth++) {
             pathSolution = DFSSetDepth(depth);
 
@@ -204,7 +210,6 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
                 break;
             }
         }
-
         return pathSolution;
     }
 
@@ -379,11 +384,13 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         List<Boolean> visited = prepareVisitedList();
         Stack<Node> nodeStack = new Stack<Node>();
         List<Node> path = new ArrayList<>();
+        Long steps = 0L;
 
         nodeStack.push(beginOfMaze);
         Integer currentDepth = 0;
 
         while (!nodeStack.empty()) {
+            steps++;
             Node currentNode = nodeStack.peek();
             setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
             if (checkMazeEnd(currentNode)) {
@@ -415,6 +422,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
             path.add(nodeStack.pop());
         }
 
+        lastRunSteps += steps;
         return path;
     }
 }
