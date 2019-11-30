@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.*;
 
@@ -18,6 +20,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     private Node beginOfMaze, endOfMaze;
     private Integer sizeX, sizeY;
     private List<Node> pathSolution;
+    private Long lastRunSteps;
 
     //Maze Creator
     @Override
@@ -27,7 +30,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     @Override
     public void generateMazeStructure(Integer x, Integer y) throws InvalidParameterException {
-        if (x <=1 || y <= 1)
+        if (x <= 1 || y <= 1)
             throw new InvalidParameterException();
         Random random = new Random();
 
@@ -79,8 +82,8 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
     //Maze Printer
     @Override
-    public boolean saveMazeStructureToFile(String path) throws IOException{
-        return false;
+    public void saveMazeStructureToFile(String fileName) throws IOException {
+        saveToFile(fileName);
     }
 
     @Override
@@ -153,6 +156,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         List<Boolean> visited = prepareVisitedList();
         List<Node> path = new ArrayList<>();
         Queue<Node> nodeQueue = new LinkedList<>();
+        Long steps = 0L;
         nodeQueue.add(beginOfMaze);
 
         List<Node> backtrackList = new ArrayList<>();
@@ -163,6 +167,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         }
 
         while (!nodeQueue.isEmpty()) {
+            steps++;
             Node node = nodeQueue.poll();
             setVisitedFromCoordinates(visited, node.getX(), node.getY(), true);
             if (checkMazeEnd(node))
@@ -183,18 +188,21 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         }
         path.add(beginOfMaze);
 
+        lastRunSteps = steps;
         pathSolution = path;
         return pathSolution;
     }
 
     @Override
     public List<Node> DFS() {
+        lastRunSteps = 0L;
         pathSolution = DFSSetDepth(sizeX * sizeY);
         return pathSolution;
     }
 
     @Override
     public List<Node> IDFS() {
+        lastRunSteps = 0L;
         for (int depth = 1; depth < sizeX * sizeY; depth++) {
             pathSolution = DFSSetDepth(depth);
 
@@ -202,7 +210,6 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
                 break;
             }
         }
-
         return pathSolution;
     }
 
@@ -210,6 +217,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     public Maze clone() throws CloneNotSupportedException {
         return (Maze) super.clone();
     }
+
     //Private Methods
     private void generateRandomStartAndEnd() {
         beginOfMaze = generateRandomPoint();
@@ -283,6 +291,30 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         }
     }
 
+    private void saveToFile(String fileName) throws IOException {
+        PrintWriter writer = new PrintWriter(fileName + ".txt", StandardCharsets.UTF_8);
+        List<Boolean> visited = prepareVisitedList();
+
+        writer.println(sizeX + " " + sizeY);
+        writer.println(beginOfMaze.getX() + " " + beginOfMaze.getY());
+        writer.println(endOfMaze.getX() + " " + endOfMaze.getY());
+
+        for (int i = 0; i < sizeY; i++) {
+            for (int j = 0; j < sizeX; j++) {
+                Node currentNode = getNode(i, j);
+                setVisitedFromCoordinates(visited, i, j, true);
+
+                for (Node neighbour : currentNode.getNeighbours()) {
+                    if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())) {
+                        writer.println(currentNode.getX() + " " + currentNode.getY() + " " +
+                                neighbour.getX() + " " + neighbour.getY());
+                    }
+                }
+            }
+        }
+        writer.close();
+    }
+
     private void readFromFile(String path) throws IOException {
         BufferedReader reader;
         reader = new BufferedReader(new FileReader(path));
@@ -352,11 +384,13 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         List<Boolean> visited = prepareVisitedList();
         Stack<Node> nodeStack = new Stack<Node>();
         List<Node> path = new ArrayList<>();
+        Long steps = 0L;
 
         nodeStack.push(beginOfMaze);
         Integer currentDepth = 0;
 
         while (!nodeStack.empty()) {
+            steps++;
             Node currentNode = nodeStack.peek();
             setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
             if (checkMazeEnd(currentNode)) {
@@ -388,6 +422,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
             path.add(nodeStack.pop());
         }
 
+        lastRunSteps += steps;
         return path;
     }
 }

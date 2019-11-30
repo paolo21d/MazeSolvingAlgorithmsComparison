@@ -21,7 +21,9 @@ public interface MazePrinter {
     String getSimplifiedMazeSolution();
 
     /**
-     * This method save maze structure to file in special format, which can be read by app later
+     * This method saves maze structure to file in special format, which can be read by app later.
+     *
+     * @param fileName String having name of file without extension
      * */
-    boolean saveMazeStructureToFile(String path) throws IOException;
+    void saveMazeStructureToFile(String fileName) throws IOException;
 }
