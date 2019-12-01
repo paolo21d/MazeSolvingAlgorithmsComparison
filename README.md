@@ -31,5 +31,11 @@ https://trello.com/b/LbkAuX9o/pszt-p1-labirynt
     - 'rozgrzanie' maszyny wirtualnej Javy
     - uruchomienie kolejnych algorytmów z pomiarem czasu
     - wygenerowanie statystyk dla algorytmów
-    - zaprezentowanie graficzne jaką drogę znalazły poszczególne algorytmy (jakie pola były odwiedzone i ile razy)
-4) Graficzny interfejs użytkownika - GUI
+    
+<b>Budowanie projektu:<b>
+- do budowania został użyty maven
+- mvn clean install
+
+<b>Uruchomienie aplikacji:<b><br/>
+- po zbudowaniu projektu należy przejść do folderu target
+- uruchomiamy za pomocą komendy: java - jar MazeSolver-1.0.jar
