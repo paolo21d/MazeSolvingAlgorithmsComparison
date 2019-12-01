@@ -387,7 +387,6 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         Long steps = 0L;
 
         nodeStack.push(beginOfMaze);
-        Integer currentDepth = 0;
 
         while (!nodeStack.empty()) {
             steps++;
@@ -397,23 +396,20 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
                 break;
             }
 
-            if (currentDepth.equals(depth)) {
+            if (nodeStack.size() - 1 == depth) {
                 nodeStack.pop();
-                currentDepth--;
                 continue;
             }
 
             for (Node neighbour : currentNode.getNeighbours()) {
                 if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())) {
                     nodeStack.push(neighbour);
-                    currentDepth++;
                     break;
                 }
             }
 
             if (nodeStack.peek() == currentNode) {
                 nodeStack.pop();
-                currentDepth--;
             }
 
         }
