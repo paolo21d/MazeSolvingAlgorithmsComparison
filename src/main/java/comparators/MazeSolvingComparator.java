@@ -16,11 +16,11 @@ public class MazeSolvingComparator {
 
     public static void simpleComparator(Maze maze) {
         //BFS
-        System.out.println("BFS:\t"+getDurationOfBFS(maze)+"ms");
+        System.out.println("BFS:\t" + getDurationOfBFS(maze) + "ms\t" + maze.getLastRunSteps() + "steps");
         //DFS
-        System.out.println("DFS:\t"+getDurationOfDFS(maze)+"ms");
+        System.out.println("DFS:\t" + getDurationOfDFS(maze) + "ms\t" + maze.getLastRunSteps() + "steps");
         //IDFS
-        System.out.println("IDFS:\t"+getDurationOfIDFS(maze)+"ms");
+        System.out.println("IDFS:\t" + getDurationOfIDFS(maze) + "ms\t" + maze.getLastRunSteps() + "steps");
     }
 
     public static void averageComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) throws InvalidParameterException {
@@ -29,20 +29,57 @@ public class MazeSolvingComparator {
         List<Long> durationsOfDFS = new ArrayList<>();
         List<Long> durationsOfIDFS = new ArrayList<>();
 
-        for(Integer i=0; i<quantityOfTries; i++){
+        List<Long> stepsOfBFS = new ArrayList<>();
+        List<Long> stepsOfDFS = new ArrayList<>();
+        List<Long> stepsOfIDFS = new ArrayList<>();
+
+        for (Integer i = 0; i < quantityOfTries; i++) {
             maze.generateMazeStructure(sizeX, sizeY);
             durationsOfBFS.add(getDurationOfBFS(maze));
+            stepsOfBFS.add(maze.getLastRunSteps());
             durationsOfDFS.add(getDurationOfDFS(maze));
+            stepsOfDFS.add(maze.getLastRunSteps());
             durationsOfIDFS.add(getDurationOfIDFS(maze));
+            stepsOfIDFS.add(maze.getLastRunSteps());
         }
 
         double averageDurationOfBFS = durationsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
         double averageDurationOfDFS = durationsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
         double averageDurationOfIDFS = durationsOfIDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
 
-        System.out.println("BFS:\t"+averageDurationOfBFS+"ms");
-        System.out.println("DFS:\t"+averageDurationOfDFS+"ms");
-        System.out.println("IDFS:\t"+averageDurationOfIDFS+"ms");
+        double averageStepsOfBFS = stepsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+        double averageStepsOfDFS = stepsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+        double averageStepsOfIDFS = stepsOfIDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+
+        System.out.println("BFS:\t" + averageDurationOfBFS + "ms\t" + averageStepsOfBFS + "steps");
+        System.out.println("DFS:\t" + averageDurationOfDFS + "ms\t" + averageStepsOfDFS + "steps");
+        System.out.println("IDFS:\t" + averageDurationOfIDFS + "ms\t" + averageStepsOfIDFS + "steps");
+    }
+
+    public static void averageComparatorWithoutIDFS(Integer sizeX, Integer sizeY, Integer quantityOfTries) throws InvalidParameterException {
+        Maze maze = new Maze();
+        List<Long> durationsOfBFS = new ArrayList<>();
+        List<Long> durationsOfDFS = new ArrayList<>();
+
+        List<Long> stepsOfBFS = new ArrayList<>();
+        List<Long> stepsOfDFS = new ArrayList<>();
+
+        for (Integer i = 0; i < quantityOfTries; i++) {
+            maze.generateMazeStructure(sizeX, sizeY);
+            durationsOfBFS.add(getDurationOfBFS(maze));
+            stepsOfBFS.add(maze.getLastRunSteps());
+            durationsOfDFS.add(getDurationOfDFS(maze));
+            stepsOfDFS.add(maze.getLastRunSteps());
+        }
+
+        double averageDurationOfBFS = durationsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+        double averageDurationOfDFS = durationsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+
+        double averageStepsOfBFS = stepsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+        double averageStepsOfDFS = stepsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
+
+        System.out.println("BFS:\t" + averageDurationOfBFS + "ms\t" + averageStepsOfBFS + "steps");
+        System.out.println("DFS:\t" + averageDurationOfDFS + "ms\t" + averageStepsOfDFS + "steps");
     }
 
     public static void averageMultiThreadComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) {
@@ -50,7 +87,7 @@ public class MazeSolvingComparator {
         List<Maze> mazesDFS = new ArrayList<>();
         List<Maze> mazesIDFS = new ArrayList<>();
         try {
-            for(int i=0; i<quantityOfTries; i++) {
+            for (int i = 0; i < quantityOfTries; i++) {
                 Maze maze = new Maze();
                 maze.generateMazeStructure(sizeX, sizeY);
                 mazesBFS.add(maze.clone());
@@ -80,29 +117,29 @@ public class MazeSolvingComparator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("BFS:\t"+bfsRunner.getAverageDuration()+"ms");
-        System.out.println("DFS:\t"+dfsRunner.getAverageDuration()+"ms");
-        System.out.println("IDFS:\t"+idfsRunner.getAverageDuration()+"ms");
+        System.out.println("BFS:\t" + bfsRunner.getAverageDuration() + "ms\t" + bfsRunner.getAverageSteps() + "steps");
+        System.out.println("DFS:\t" + dfsRunner.getAverageDuration() + "ms\t" + dfsRunner.getAverageSteps() + "steps");
+        System.out.println("IDFS:\t" + idfsRunner.getAverageDuration() + "ms\t" + idfsRunner.getAverageSteps() + "steps");
     }
 
     public static Long getDurationOfBFS(Maze maze) {
         long start = System.currentTimeMillis();
         maze.BFS();
         long end = System.currentTimeMillis();
-        return end-start;
+        return end - start;
     }
 
     public static Long getDurationOfDFS(Maze maze) {
         long start = System.currentTimeMillis();
         maze.DFS();
         long end = System.currentTimeMillis();
-        return end-start;
+        return end - start;
     }
 
     public static Long getDurationOfIDFS(Maze maze) {
         long start = System.currentTimeMillis();
         maze.IDFS();
         long end = System.currentTimeMillis();
-        return end-start;
+        return end - start;
     }
 }

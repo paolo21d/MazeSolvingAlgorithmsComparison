@@ -20,6 +20,7 @@ public class IDFSRunner extends Runner implements Runnable {
             durations.add(time);
         }
         averageDuration = durations.stream().mapToDouble(val -> val).average().orElse(0.0);
+        averageSteps = steps.stream().mapToDouble(val -> val).average().orElse(0.0);
         //System.out.println("IDFS: " + averageDuration);
     }
 }
