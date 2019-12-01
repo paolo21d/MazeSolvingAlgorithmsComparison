@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.*;
 
@@ -384,12 +383,11 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
         List<Boolean> visited = prepareVisitedList();
         Stack<Node> nodeStack = new Stack<Node>();
         List<Node> path = new ArrayList<>();
-        Long steps = 0L;
+        Long steps = 1L;
 
         nodeStack.push(beginOfMaze);
 
         while (!nodeStack.empty()) {
-            steps++;
             Node currentNode = nodeStack.peek();
             setVisitedFromCoordinates(visited, currentNode.getX(), currentNode.getY(), true);
             if (checkMazeEnd(currentNode)) {
@@ -403,6 +401,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
 
             for (Node neighbour : currentNode.getNeighbours()) {
                 if (!isVisitedFromCoordinates(visited, neighbour.getX(), neighbour.getY())) {
+                    steps++;
                     nodeStack.push(neighbour);
                     break;
                 }
