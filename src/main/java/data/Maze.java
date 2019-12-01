@@ -292,7 +292,7 @@ public class Maze implements MazeCreator, MazeSolver, MazePrinter, Cloneable {
     }
 
     private void saveToFile(String fileName) throws IOException {
-        PrintWriter writer = new PrintWriter(fileName + ".txt", StandardCharsets.UTF_8);
+        PrintWriter writer = new PrintWriter(fileName + ".txt");
         List<Boolean> visited = prepareVisitedList();
 
         writer.println(sizeX + " " + sizeY);
