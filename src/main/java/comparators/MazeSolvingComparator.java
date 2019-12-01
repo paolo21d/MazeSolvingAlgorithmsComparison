@@ -24,6 +24,11 @@ public class MazeSolvingComparator {
     }
 
     public static void averageComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) throws InvalidParameterException {
+        averageComparatorChoosingAlgorithm(sizeX, sizeY, quantityOfTries, true, true, true);
+    }
+
+    public static void averageComparatorChoosingAlgorithm(Integer sizeX, Integer sizeY, Integer quantityOfTries,
+                                                          boolean doBFS, boolean doDFS, boolean doIDFS) throws InvalidParameterException {
         Maze maze = new Maze();
         List<Long> durationsOfBFS = new ArrayList<>();
         List<Long> durationsOfDFS = new ArrayList<>();
@@ -33,55 +38,45 @@ public class MazeSolvingComparator {
         List<Long> stepsOfDFS = new ArrayList<>();
         List<Long> stepsOfIDFS = new ArrayList<>();
 
-        for (Integer i = 0; i < quantityOfTries; i++) {
+        for (int i = 0; i < quantityOfTries; i++) {
             maze.generateMazeStructure(sizeX, sizeY);
-            durationsOfBFS.add(getDurationOfBFS(maze));
-            stepsOfBFS.add(maze.getLastRunSteps());
-            durationsOfDFS.add(getDurationOfDFS(maze));
-            stepsOfDFS.add(maze.getLastRunSteps());
-            durationsOfIDFS.add(getDurationOfIDFS(maze));
-            stepsOfIDFS.add(maze.getLastRunSteps());
+            if (doBFS) {
+                durationsOfBFS.add(getDurationOfBFS(maze));
+                stepsOfBFS.add(maze.getLastRunSteps());
+            }
+            if (doDFS) {
+                durationsOfDFS.add(getDurationOfDFS(maze));
+                stepsOfDFS.add(maze.getLastRunSteps());
+            }
+            if (doIDFS) {
+                durationsOfIDFS.add(getDurationOfIDFS(maze));
+                stepsOfIDFS.add(maze.getLastRunSteps());
+            }
+        }
+        double averageDurationOfBFS, averageDurationOfDFS, averageDurationOfIDFS;
+        double averageStepsOfBFS, averageStepsOfDFS, averageStepsOfIDFS;
+        if (doBFS) {
+            averageDurationOfBFS = getAverage(durationsOfBFS);
+            averageStepsOfBFS = getAverage(stepsOfBFS);
+            System.out.println("BFS:\t" + averageDurationOfBFS + " ms\t" + averageStepsOfBFS + " steps");
         }
 
-        double averageDurationOfBFS = durationsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double averageDurationOfDFS = durationsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double averageDurationOfIDFS = durationsOfIDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-
-        double averageStepsOfBFS = stepsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double averageStepsOfDFS = stepsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double averageStepsOfIDFS = stepsOfIDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-
-        System.out.println("BFS:\t" + averageDurationOfBFS + "ms\t" + averageStepsOfBFS + "steps");
-        System.out.println("DFS:\t" + averageDurationOfDFS + "ms\t" + averageStepsOfDFS + "steps");
-        System.out.println("IDFS:\t" + averageDurationOfIDFS + "ms\t" + averageStepsOfIDFS + "steps");
-    }
-
-    public static void averageComparatorWithoutIDFS(Integer sizeX, Integer sizeY, Integer quantityOfTries) throws InvalidParameterException {
-        Maze maze = new Maze();
-        List<Long> durationsOfBFS = new ArrayList<>();
-        List<Long> durationsOfDFS = new ArrayList<>();
-
-        List<Long> stepsOfBFS = new ArrayList<>();
-        List<Long> stepsOfDFS = new ArrayList<>();
-
-        for (Integer i = 0; i < quantityOfTries; i++) {
-            maze.generateMazeStructure(sizeX, sizeY);
-            durationsOfBFS.add(getDurationOfBFS(maze));
-            stepsOfBFS.add(maze.getLastRunSteps());
-            durationsOfDFS.add(getDurationOfDFS(maze));
-            stepsOfDFS.add(maze.getLastRunSteps());
+        if (doDFS) {
+            averageDurationOfDFS = getAverage(durationsOfDFS);
+            averageStepsOfDFS = getAverage(stepsOfDFS);
+            System.out.println("DFS:\t" + averageDurationOfDFS + " ms\t" + averageStepsOfDFS + " steps");
         }
-
-        double averageDurationOfBFS = durationsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double averageDurationOfDFS = durationsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-
-        double averageStepsOfBFS = stepsOfBFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double averageStepsOfDFS = stepsOfDFS.stream().mapToDouble(val -> val).average().orElse(0.0);
-
-        System.out.println("BFS:\t" + averageDurationOfBFS + "ms\t" + averageStepsOfBFS + "steps");
-        System.out.println("DFS:\t" + averageDurationOfDFS + "ms\t" + averageStepsOfDFS + "steps");
+        if (doIDFS) {
+            averageDurationOfIDFS = getAverage(durationsOfIDFS);
+            averageStepsOfIDFS = getAverage(stepsOfIDFS);
+            System.out.println("IDFS:\t" + averageDurationOfIDFS + " ms\t" + averageStepsOfIDFS + " steps");
+        }
     }
 
+    /**
+     * Experimental function, it should be use only on processors with minimum 3 cores
+     * It runs measuring time of each algorithm simultaneously
+     */
     public static void averageMultiThreadComparator(Integer sizeX, Integer sizeY, Integer quantityOfTries) {
         List<Maze> mazesBFS = new ArrayList<>();
         List<Maze> mazesDFS = new ArrayList<>();
@@ -117,9 +112,9 @@ public class MazeSolvingComparator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("BFS:\t" + bfsRunner.getAverageDuration() + "ms\t" + bfsRunner.getAverageSteps() + "steps");
-        System.out.println("DFS:\t" + dfsRunner.getAverageDuration() + "ms\t" + dfsRunner.getAverageSteps() + "steps");
-        System.out.println("IDFS:\t" + idfsRunner.getAverageDuration() + "ms\t" + idfsRunner.getAverageSteps() + "steps");
+        System.out.println("BFS:\t" + bfsRunner.getAverageDuration() + " ms\t" + bfsRunner.getAverageSteps() + " steps");
+        System.out.println("DFS:\t" + dfsRunner.getAverageDuration() + " ms\t" + dfsRunner.getAverageSteps() + " steps");
+        System.out.println("IDFS:\t" + idfsRunner.getAverageDuration() + " ms\t" + idfsRunner.getAverageSteps() + " steps");
     }
 
     public static Long getDurationOfBFS(Maze maze) {
@@ -141,5 +136,9 @@ public class MazeSolvingComparator {
         maze.IDFS();
         long end = System.currentTimeMillis();
         return end - start;
+    }
+
+    private static double getAverage(List<Long> list) {
+        return list.stream().mapToDouble(val -> val).average().orElse(0.0);
     }
 }

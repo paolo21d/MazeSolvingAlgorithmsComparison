@@ -9,31 +9,69 @@ import java.util.Scanner;
 
 public class SimpleMode {
     static boolean JVMReady = false;
+
     public static void main(String[] args) {
-        /*Maze maze = new Maze();
-        maze.generateMazeStructure(25, 25);
-        maze.BFS();
-        System.out.println(maze.getSimplifiedMazeSolution());
-        maze.IDFS();
-        System.out.println(maze.getSimplifiedMazeSolution());
-        maze.DFS();
-        System.out.println(maze.getSimplifiedMazeSolution());*/
+        prepareJavaMachine();
+        /*System.out.println("Size 10");
+        MazeSolvingComparator.averageComparator(10, 10, 150);
+        System.out.println("Size 25");
+        MazeSolvingComparator.averageComparator(25, 25, 150);
+        System.out.println("Size 50");
+        MazeSolvingComparator.averageComparator(50, 50, 150);
+        System.out.println("Size 100");
+        MazeSolvingComparator.averageComparator(100, 100, 100);
 
-        //MazeSolvingComparator.simpleComparator(1000, 1000);
-        //prepareJavaMachine();
-        //MazeSolvingComparator.averageComparator(10, 10, 20);
+        System.out.println("Size 200");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(200, 200, 100, true, true, false);
+        System.out.println("Size 500");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(500, 500, 100, true, true, false);
+        System.out.println("Size 700");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(700, 700, 80, true, true, false);
+        System.out.println("Size 1000");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(1000, 1000, 60, true, true, false);
+        System.out.println("Size 1500");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(1500, 1500, 40, true, true, false);
+        System.out.println("Size 2000");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(2000, 2000, 20, true, true, false);*/
 
+        //Compare without IDFS
+        /*System.out.println("Size 10");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(10, 10, 100, true, true, false);
+        System.out.println("Size 25");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(25, 25, 100, true, true, false);
+        System.out.println("Size 50");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(50, 50, 100, true, true, false);
+        System.out.println("Size 100");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(100, 100, 100, true, true, false);
+        System.out.println("Size 200");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(200, 200, 100, true, true, false);
+        System.out.println("Size 500");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(500, 500, 100, true, true, false);
+        System.out.println("Size 700");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(700, 700, 80, true, true, false);
+        System.out.println("Size 1000");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(1000, 1000, 60, true, true, false);
+        System.out.println("Size 1500");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(1500, 1500, 40, true, true, false);
+        System.out.println("Size 2500");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(2500, 2500, 1, true, true, false);
+        System.out.println("Size 3000");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(3000, 3000, 1, true, true, false);
+        System.out.println("Size 3500");
+        MazeSolvingComparator.averageComparatorChoosingAlgorithm(3500, 3500, 1, true, true, false);*/
 
         //MazeSolvingComparator.averageMultiThreadComparator(300, 300, 50);
         menu();
     }
 
     private static void prepareJavaMachine() {
-        if(JVMReady)
+        if (JVMReady)
             return;
         Maze maze = new Maze();
-        maze.generateMazeStructure(200, 200);
+        maze.generateMazeStructure(150, 150);
         maze.IDFS();
+        maze.DFS();
+        maze.BFS();
         JVMReady = true;
     }
 
@@ -63,64 +101,70 @@ public class SimpleMode {
         String option;
         Integer sizeX, sizeY, quantityOfTries;
         Maze maze = null;
+        prepareJavaMachine();
 
         while (!exit) {
             if (mainMenu) {
                 System.out.println(mainMenuMessage);
                 option = in.nextLine();
-                switch (option) {
-                    case "1":  //read from file
-                        System.out.println("Enter file path");
-                        String path = in.nextLine();
-                        maze = new Maze();
-                        try {
-                            maze.readMazeStructureFromFile(path);
-                        } catch (IOException e) {
-                            System.out.println(e.toString());
-                            maze = null;
-                            continue;
-                        }
-                        loadedMenu = true;
-                        mainMenu = false;
-                        break;
-                    case "2":  //generate maze
-                        System.out.println("Maze size X:");
-                        sizeX = Integer.parseInt(in.nextLine());
-                        System.out.println("Maze size Y:");
-                        sizeY = Integer.parseInt(in.nextLine());
-                        maze = new Maze();
-                        try {
-                            maze.generateMazeStructure(sizeX, sizeY);
-                        } catch (InvalidParameterException e) {
-                            System.out.println("Invalid parameters!");
-                            maze = null;
-                            continue;
-                        }
-                        generatedMenu = true;
-                        mainMenu = false;
-                        break;
-                    case "3": //Print stats
-                        System.out.println("Maze size X:");
-                        sizeX = Integer.parseInt(in.nextLine());
-                        System.out.println("Maze size Y:");
-                        sizeY = Integer.parseInt(in.nextLine());
-                        System.out.println("Quantity of tries:");
-                        quantityOfTries = Integer.parseInt(in.nextLine());
-                        System.out.println("Calculating...");
-                        try {
-                            prepareJavaMachine();
-                            MazeSolvingComparator.averageComparator(sizeX, sizeY, quantityOfTries);
-                        } catch (InvalidParameterException e) {
-                            System.out.println("Invalid parameter!");
-                        }
-                        break;
-                    case "0": //close app
-                        exit = true;
-                        break;
+                try {
+                    switch (option) {
+                        case "1":  //read from file
+                            System.out.println("Enter file path");
+                            String path = in.nextLine();
+                            maze = new Maze();
+                            try {
+                                maze.readMazeStructureFromFile(path);
+                            } catch (IOException e) {
+                                System.out.println(e.toString());
+                                maze = null;
+                                continue;
+                            }
+                            loadedMenu = true;
+                            mainMenu = false;
+                            break;
+                        case "2":  //generate maze
+                            System.out.println("Maze size X:");
+                            sizeX = Integer.parseInt(in.nextLine());
+                            System.out.println("Maze size Y:");
+                            sizeY = Integer.parseInt(in.nextLine());
+                            maze = new Maze();
+                            try {
+                                maze.generateMazeStructure(sizeX, sizeY);
+                            } catch (InvalidParameterException e) {
+                                System.out.println("Invalid parameters!");
+                                maze = null;
+                                continue;
+                            }
+                            generatedMenu = true;
+                            mainMenu = false;
+                            break;
+                        case "3": //Print stats
+                            System.out.println("Maze size X:");
+                            sizeX = Integer.parseInt(in.nextLine());
+                            System.out.println("Maze size Y:");
+                            sizeY = Integer.parseInt(in.nextLine());
+                            System.out.println("Quantity of tries:");
+                            quantityOfTries = Integer.parseInt(in.nextLine());
+                            System.out.println("Calculating...");
+                            try {
+                                prepareJavaMachine();
+                                MazeSolvingComparator.averageComparator(sizeX, sizeY, quantityOfTries);
+                            } catch (InvalidParameterException e) {
+                                System.out.println("Invalid parameter!");
+                            }
+                            break;
+                        case "0": //close app
+                            exit = true;
+                            break;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input parameter!");
+                    mainMenu = true;
+                    generatedMenu = false;
+                    loadedMenu = false;
                 }
-
-            }
-            else if (generatedMenu && maze != null) { //maze structure randomly generated
+            } else if (generatedMenu && maze != null) { //maze structure randomly generated
                 System.out.println(generatedMenuMessage);
                 option = in.nextLine();
                 switch (option) {
@@ -148,8 +192,7 @@ public class SimpleMode {
                         break;
                 }
 
-            }
-            else if (loadedMenu && maze != null) { //maze structure loaded from file
+            } else if (loadedMenu && maze != null) { //maze structure loaded from file
                 System.out.println(loadedMenuMessage);
                 option = in.nextLine();
                 switch (option) {
